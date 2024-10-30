@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 
+from quizai.utils import JwtHandler
+
 from .serializers import UserSerializer
 from .models import User
 
@@ -22,19 +24,21 @@ class LoginView(APIView):
 
         user = User.objects.filter(email=email).first()
 
-        if user is None:
-            raise AuthenticationFailed('User Not Found!')
+        # if user is None:
+        #     raise AuthenticationFailed('User Not Found!')
         
-        if not user.check_password(raw_password=password):
-            raise AuthenticationFailed('Incorect Password!')
+        # if not user.check_password(raw_password=password):
+        #     raise AuthenticationFailed('Incorect Password!')
         
-        payload = {
-            "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
-            "iat": datetime.datetime.utcnow()
-        }
+        # payload = {
+        #     "id": user.id,
+        #     "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
+        #     "iat": datetime.datetime.utcnow()
+        # }
 
-        token = jwt.encode(payload=payload, key='secret', algorithm="HS256")
+        # token = jwt.encode(payload=payload, key='secret', algorithm="HS256")
+
+        token = JwtHandler.create(user=user, password=password)
 
         response = Response()
 
@@ -48,15 +52,17 @@ class LoginView(APIView):
 
 class UserView(APIView):
     def get(self, request):
-        token = request.COOKIES.get('jwt')
+        # token = request.COOKIES.get('jwt')
 
-        if not token:
-            raise AuthenticationFailed("Unauthenticated")
+        # if not token:
+        #     raise AuthenticationFailed("Unauthenticated")
         
-        try:
-            payload = jwt.decode(token, "secret", algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed("Unauthenticated")
+        # try:
+        #     payload = jwt.decode(token, "secret", algorithms=["HS256"])
+        # except jwt.ExpiredSignatureError:
+        #     raise AuthenticationFailed("Unauthenticated")
+
+        payload = JwtHandler.check(request=request)
 
         user = User.objects.filter(id=payload["id"]).first()
         serializer = UserSerializer(user)
