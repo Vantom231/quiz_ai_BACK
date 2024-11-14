@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'history',
+    'quizes',
+    'gpt',
 ]
 
 MIDDLEWARE = [

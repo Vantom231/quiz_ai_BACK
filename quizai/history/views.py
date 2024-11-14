@@ -45,10 +45,11 @@ class HistoryQuizView(APIView):
     def post(self, request):
         payload = JwtHandler.check(request=request)
         user = User.objects.filter(id=payload["id"]).first()
+        number = HistoryQuiz.objects.filter(user=user).count()
 
         serializer = HistoryQuizSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
+        serializer.save(user=user, number=number)
 
         quiz =  HistoryQuiz.objects.filter(id=serializer.data["id"]).first()
         

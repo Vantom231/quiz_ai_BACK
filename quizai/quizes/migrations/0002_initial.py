@@ -10,19 +10,19 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('history', '0001_initial'),
+        ('quizes', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historyquiz',
+            model_name='subject',
             name='user',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='historyquestion',
-            name='quiz',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='history.historyquiz'),
+            model_name='resoults',
+            name='subject',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='quizes.subject'),
         ),
     ]
