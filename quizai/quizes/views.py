@@ -74,6 +74,18 @@ class ResoultsView(APIView):
         if user.id != subject.user.id:
             raise AuthenticationFailed("Unauthorized!")
 
+        resoults = Resoults.objects.filter(subject=subject)
+
+        if resoults.count() == 0:
+            for ct in range(3):
+                res_temp = Resoults(
+                    accuracy=50,
+                    questions_quantity=subject.number_of_questions,
+                    creation_date= datetime.datetime.now(),
+                    subject = subject
+                    )
+                res_temp.save()
+
         serializer.is_valid(raise_exception=True)
         serializer.save(subject=subject, creation_date=datetime.datetime.now())
 
@@ -91,8 +103,12 @@ class ResoultsView(APIView):
         subject.number_finished = subject.number_finished + 1
         if (accuracy >= 65 and subject.difficulty < 4):
             subject.difficulty = subject.difficulty + 1
+            for res in resoults:
+                res.delete()
         if (accuracy <= 20 and subject.difficulty > 0):
             subject.difficulty = subject.difficulty - 1
+            for res in resoults:
+                res.delete()
         subject.save()
 
         return Response(serializer.data)
