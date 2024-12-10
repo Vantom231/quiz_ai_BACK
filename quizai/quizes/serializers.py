@@ -10,7 +10,9 @@ class SubjectSerializer(serializers.ModelSerializer):
             'level',
             'difficulty',
             'number_finished',
-            'number_of_questions'
+            'number_of_questions',
+            'question',
+            'level_class',
             ]
 
     def create(self, validated_data):

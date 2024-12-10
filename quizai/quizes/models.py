@@ -7,8 +7,11 @@ class Subject(models.Model):
     level = models.IntegerField()
     difficulty = models.IntegerField()
     number_finished = models.IntegerField(default=0, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     number_of_questions = models.IntegerField(default=5)
+    level_class = models.IntegerField(blank=True, null=True)
+    question = models.TextField(255, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
 
 class Resoults(models.Model):

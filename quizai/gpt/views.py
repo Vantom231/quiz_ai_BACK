@@ -41,17 +41,33 @@ class generationView(APIView):
         api_key = os.getenv("OPENAI_API_KEY")
 
         client = OpenAI(api_key=api_key)
+        
+        system_prompt = ""
+        system_prompt += f"Jesteś nauczycielem przedmiotu {subject.name}, "
+        system_prompt += f"uczysz na poziomie {self._level[subject.level]} "
 
-        resp = client.chat.completions.create(
-            messages = [
-                {"role":"system", "content": f"Jesteś nauczycielem przedmiotu {subject.name} na poziomie {self._level[subject.level]}"},
-                {"role":"user", "content": f"""wygeneruj quiz składający się z {subject.number_of_questions} {self._difficulty[subject.difficulty]} pytań. 
-                    Żadne z pytań nie może przekraczać 50 słów, dodadkowo do każdego z pytać dołącz 4 odpowiedzi, 
+        user_prompt = ""
+        user_prompt += f"Stwórz quiz składający się z {subject.number_of_questions} {self._difficulty[subject.difficulty]} pytań, "
+        if subject.level_class:
+            if subject.difficulty > 1 :
+                user_prompt += f"dla roku {subject.level_class} {self._level[subject.level]} "
+            else:
+                user_prompt += f"dla {subject.level_class} klasy {self._level[subject.level]}, "
+        if subject.question:
+            user_prompt += f"na temat {subject.question}. "
+
+        user_prompt += """Żadne z pytań nie może przekraczać 50 słów, dodadkowo do każdego z pytać dołącz 4 odpowiedzi, 
                     z których tylko jedna będzie poporawna, a trzy nie poprawne. 
                     Odpowiedź zamieść w tabeli json o strukturze: 
                     Pytani jako 'q', odpowiedź A jako 'a', odpowiedź B jako 'b', odpowiedź C jako 'c', odpowiedź D jako 'd',
                     i poprawna odpowiedź jako 'anw'.
-                    Wygeneruj tylko tabelę, bez żadnych dodatkowych danych."""}
+                    Wygeneruj tylko tabelę, bez żadnych dodatkowych danych."""
+
+        print(user_prompt)
+        resp = client.chat.completions.create(
+            messages = [
+                {"role":"system", "content": system_prompt},
+                {"role":"user", "content": user_prompt}
             ],
             model = "gpt-4o-mini",
             max_tokens=1000,
