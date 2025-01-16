@@ -1,3 +1,4 @@
+import json
 class Dashboard:
     finished_quizes = 0
     subject_active = 0
@@ -5,7 +6,6 @@ class Dashboard:
     quizes_generated = 0
 
     name = ""
-    sur_name = "" 
+    email = "" 
     user_name = ""
 
-    subject_list = []

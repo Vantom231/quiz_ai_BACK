@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 
 from quizai.utils import JwtHandler
+from quizes.models import Subject
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, DashboardSerializer
 from .models import User
+from .dashboard import Dashboard
 
-import jwt, datetime
+import jwt, datetime, json
 
 # Create your views here.
 class RegisterView(APIView):
@@ -68,6 +70,44 @@ class UserView(APIView):
         serializer = UserSerializer(user)
 
         return Response(serializer.data)
+
+
+class DashboardView(APIView):
+    def get(self, request):
+        payload = JwtHandler.check(request=request)
+
+        user = User.objects.filter(id=payload["id"]).first()
+        subjects_len = len(Subject.objects.filter(user=user).all())
+
+        dashboard = Dashboard()
+        dashboard.finished_quizes = user.finished_quizes
+        dashboard.subject_created = user.subject_created
+        dashboard.quizes_generated = user.generated_quizes
+
+        dashboard.name = user.name
+        dashboard.email = user.email
+        dashboard.user_name = user.username
+
+        #dashboard.subject_list = subjects
+        serializer = DashboardSerializer({
+            "finished_quizes": user.finished_quizes, 
+            "subject_active": subjects_len, 
+            "subject_created": user.subject_created, 
+            "quizes_generated": user.generated_quizes, 
+            "name": user.name, 
+            "email": user.email, 
+            "user_name": user.username 
+            })
+
+        #res = json.dumps(dashboard)
+
+        return Response(serializer.data)
+
+
+
+
+
+
 
 
 class LogOutView(APIView):

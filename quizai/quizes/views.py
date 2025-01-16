@@ -61,6 +61,9 @@ class SubjectView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(number_finished=0, user=user)
 
+        user.subject_created = user.subject_created + 1
+        user.save()
+
         return Response(serializer.data)
 
 
@@ -110,6 +113,10 @@ class ResoultsView(APIView):
             for res in resoults:
                 res.delete()
         subject.save()
+
+        #  user changes
+        user.finished_quizes = user.finished_quizes +1
+        user.save()
 
         return Response(serializer.data)
 

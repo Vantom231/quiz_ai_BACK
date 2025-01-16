@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from .dashboard import Dashboard
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +17,14 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class DashboardSerializer(serializers.Serializer):
+    finished_quizes = serializers.IntegerField()
+    subject_active = serializers.IntegerField()
+    subject_created = serializers.IntegerField()
+    quizes_generated = serializers.IntegerField()
+
+    name = serializers.StringRelatedField()
+    email = serializers.StringRelatedField()
+    user_name = serializers.StringRelatedField()
+
